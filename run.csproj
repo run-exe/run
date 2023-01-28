@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Dotnet CLI tool allowing you to run C# applets.</Description>
+    <Version>2023.0128.2321.40</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>run</AssemblyName>
+    <IsPackable>true</IsPackable>
+    <PackageId>run</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <PreserveCompilationContext>false</PreserveCompilationContext>
+    <Authors>javacommons</Authors>
+    <Company>JavaCommons Technologies</Company>
+    <Copyright>Copyright © 2023-present JavaCommons Technologies</Copyright>
+    <PackageProjectUrl>https://github.com/run-exe/run</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/run-exe/run.git</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <ApplicationIcon>tarantula.ico</ApplicationIcon>
+    <RootNamespace>Run.Exe</RootNamespace>
+    <DefineConstants>$(DefineConstants);NETCORE;NET6_0</DefineConstants>
+   </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>
