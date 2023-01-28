@@ -21,9 +21,23 @@ public static class Program
             Environment.Exit(1);
         }
         string appName = args[0];
+        string userName = "run-exe";
+        string[] appNameParts = appName.Split('.');
+        if (appNameParts.Length == 1)
+        {
+        }
+        else if (appNameParts.Length == 2)
+        {
+            userName = appNameParts[0];
+        }
+        else
+        {
+            Console.Error.WriteLine("Invalid program name.");
+            Environment.Exit(1);
+        }
         ArraySegment<string> arySeg = new ArraySegment<string>(args, 1, args.Length - 1);
         string[] argsSlice = arySeg.ToArray();
-        string xmlUrl = $"https://github.com/run-exe/run-exe/releases/download/64bit/{appName}.xml";
+        string xmlUrl = $"https://github.com/{userName}/tools/releases/download/windows-64bit/{appName}.xml";
         RunSelectedProgram(appName, xmlUrl, argsSlice);
     }
 
@@ -36,14 +50,8 @@ public static class Program
         XElement root = doc.Root;
         var version = root.Element("version").Value;
         var url = root.Element("url").Value;
-        /*
-        var json = GetStringFromUrl(jsonUrl);
-        var root = System.Text.Json.JsonDocument.Parse(json).RootElement;
-        var version = root.GetProperty("version").GetString();
-        var url = root.GetProperty("url").GetString();
-        */
-        var mainDll = $"{appName}.exe"; //root.GetProperty("main_dll").GetString();
-        var mainClass = $"{appName.Replace("-", "_")}.Program"; //root.GetProperty("main_class").GetString();
+        var mainDll = $"{appName}.exe";
+        var mainClass = $"{appName.Replace("-", "_")}.Program";
         Console.Error.WriteLine(version);
         Console.Error.WriteLine(url);
         var profilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -94,47 +102,18 @@ public static class Program
         process.StartInfo.Arguments = argList;
         process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
         process.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
-        //process.Exited += (IChannelSender, e) => { Environment.Exit(process.ExitCode); };
         process.Start();
-
         Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
-            //process.CancelOutputRead(); // 使い終わったら止める
-            //process.CancelErrorRead();
             process.Kill();
         };
-
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-
         process.WaitForExit();
-
-        process.CancelOutputRead(); // 使い終わったら止める
+        process.CancelOutputRead();
         process.CancelErrorRead();
-        
         Environment.Exit(process.ExitCode);
     }
-
-#if false
-    static void StartAssembly(string path, string mainClass, string version, string[] args)
-    {
-        Assembly test01Dll = Assembly.LoadFrom(path);
-        var appType = test01Dll.GetType(mainClass);
-        if (appType == null)
-        {
-            Console.Error.WriteLine("(appType == null)");
-            return;
-        }
-        var setVersion = appType.GetMethod("SetVersion", BindingFlags.Public | BindingFlags.Static);
-        if (setVersion != null)
-        {
-            setVersion.Invoke(null, new object[] { version });
-        }
-        var main = appType.GetMethod("Main", BindingFlags.Public | BindingFlags.Static);
-        if (main == null) Console.Error.WriteLine("(main == null)");
-        main.Invoke(null, new object[] { args });
-    }
-#endif
-    
+   
     static string GetStringFromUrl(string url)
     {
         HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
