@@ -109,7 +109,7 @@ public static class Program
         {
             Console.Error.WriteLine("else");
             process.StartInfo.FileName = "dotnet";
-            process.StartInfo.Arguments = $"run {installPath}/{appName}.dll {argList}";
+            process.StartInfo.Arguments = $"exec {installPath}/{appName}.dll {argList}";
         }
         process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
         process.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };

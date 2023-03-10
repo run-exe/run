@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Dotnet CLI tool allowing you to run C# applets.</Description>
-    <Version>2023.0310.1119.22</Version>
+    <Version>2023.0310.1150.17</Version>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
