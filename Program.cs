@@ -21,7 +21,7 @@ public static class Program
             Environment.Exit(1);
         }
         string appName = args[0];
-        string userName = "run-exe";
+        string userName = "nuget-tools";
         string[] appNameParts = appName.Split('.');
         if (appNameParts.Length == 1)
         {
@@ -45,13 +45,14 @@ public static class Program
     {
         Console.Error.WriteLine(appName);
         Console.Error.WriteLine(xmlUrl);
+        Console.Error.WriteLine("args: ["+string.Join(',', args)+"]");
         var xml = GetStringFromUrl(xmlUrl);
         XDocument doc = XDocument.Parse(xml);
         XElement root = doc.Root;
         var version = root.Element("version").Value;
         var url = root.Element("url").Value;
         var mainDll = $"{appName}.exe";
-        var mainClass = $"{appName.Replace("-", "_")}.Program";
+        //var mainClass = $"{appName.Replace("-", "_")}.Program";
         Console.Error.WriteLine(version);
         Console.Error.WriteLine(url);
         var profilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -80,12 +81,12 @@ public static class Program
             Console.Error.WriteLine($"{installPath} に展開しました");
         }
 
-        Console.Error.WriteLine($"{mainClass} を起動します");
+        Console.Error.WriteLine($"{appName} を起動します");
         Thread.Sleep(1000);
-        StartAssembly($"{installPath}\\{mainDll}", mainClass, version, args);
+        StartAssembly(installPath, appName, version, args);
     }
 
-    static void StartAssembly(string path, string mainClass, string version, string[] args)
+    static void StartAssembly(string installPath, string appName, string version, string[] args)
     {
         string argList = "";
         for (int i = 0; i < args.Length; i++)
@@ -98,12 +99,23 @@ public static class Program
         process.StartInfo.RedirectStandardError = true;
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.CreateNoWindow = true;
-        process.StartInfo.FileName = path;
-        process.StartInfo.Arguments = argList;
+        if (File.Exists($"{installPath}/{appName}.exe"))
+        {
+            Console.Error.WriteLine("then");
+            process.StartInfo.FileName = $"{installPath}/{appName}.exe";
+            process.StartInfo.Arguments = argList;
+        }
+        else
+        {
+            Console.Error.WriteLine("else");
+            process.StartInfo.FileName = "dotnet";
+            process.StartInfo.Arguments = $"run {installPath}/{appName}.dll {argList}";
+        }
         process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
         process.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
         process.Start();
-        Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
+        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
+        {
             process.Kill();
         };
         process.BeginOutputReadLine();
@@ -113,7 +125,7 @@ public static class Program
         process.CancelErrorRead();
         Environment.Exit(process.ExitCode);
     }
-   
+
     static string GetStringFromUrl(string url)
     {
         HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
